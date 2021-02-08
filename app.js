@@ -39,10 +39,11 @@ const resQuery = async () => {
 };
 
 resQuery().then(rows => {
-return{
-    data: rows
-}
-    // console.log(rows);
+    // TODO Вот тут единственное место где можно получить к ним доступ
+    console.log(rows);
+    return {
+      data: rows
+    }  
 });
 
 // const query = knex.select().table('line')
@@ -67,7 +68,7 @@ return{
     //
     //     });
 
-
+// TODO Тут ты не можешь получить данные, этот код выполнится раньше чем они придут
 console.log(resQuery.data);
 
 server.listen(port, hostname, () => {
