@@ -10,7 +10,7 @@ const server = http.createServer((req, res) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'application/json');
     // res.write();
-    res.end(JSON.stringify(resQuery()));
+    res.end(JSON.stringify(result()));
 });
 
 const knex = require('knex')({
@@ -28,35 +28,33 @@ const knex = require('knex')({
     }
 });
 
-const resQuery = async () => {
-    return knex
-        .select()
-        .from('line')
-        // TODO В этой функции данные в rows можно преобразовывать или просто удалить эут конструкцию
-        .then((rows) => {
-            return rows
-        });
-};
+    const resQuery = async () => {
+         const res = await knex
+            .select()
+            .from('line');
+         console.log(res);
+        return res
+    };
 
-resQuery().then(rows => {
-return{
-    data: rows
-}
-    // console.log(rows);
-});
+const result = async() => await resQuery();
+
+// console.log(result);
+    // const result = async () => {
+    //     const res = await resQuery();
+    //     return res;
+    // };
 
 // const query = knex.select().table('line')
 //         .then((rows) => {
-//
 //             const res = rows;
-//
 //             return (
 //                 res
 //             )
 //         });
+//
 // const resQuery  = async () => {
-//   const q = await query
-//   return q
+//   const q = await Query()
+//     return q
 // };
     //     .catch((err) => {
     //     console.log(err);
@@ -68,7 +66,6 @@ return{
     //     });
 
 
-console.log(resQuery.data);
 
 server.listen(port, hostname, () => {
     console.log(`Server 123 running at http://${hostname}:${port}/`);
