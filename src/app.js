@@ -22,14 +22,18 @@ const knex = require('knex')({
 
 app.get('/api', (req, res) => {
     let query = req.query;
+    // delete query["perpage"];
     knex
         .select()
         .from('line')
         .offset(0)
         .orderByRaw('gameid DESC')
-        .limit(10)
+        .limit(req.query.perpage)
         .where(
-            query
+            (query) => {
+                delete query["perpage"];
+            return query
+            }
         )
 
         .then(data=> res.json(data))
