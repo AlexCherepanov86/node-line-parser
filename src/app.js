@@ -21,27 +21,35 @@ const knex = require('knex')({
 });
 
 app.get('/api', (req, res) => {
-    let query = req.query;
-    // delete query["perpage"];
+    var dbReq = {};
+    var reqLimit = req.query.perpage;
+    var sort = req.query.sort;
+    (function (){
+        dbReq = (req.query);
+        delete dbReq.perpage;
+        delete dbReq.sort;
+        return dbReq
+    }());
+
+    console.log(dbReq);
+    console.log(sort);
     knex
         .select()
         .from('line')
         .offset(0)
-        .orderByRaw('gameid DESC')
-        .limit(req.query.perpage)
+        // .orderByRaw('gameid DESC')
+        // .orderBy([{column: 'gameid', order: 'desc'}])
+        .orderBy(sort)
+        .limit(reqLimit)
         .where(
-            (query) => {
-                delete query["perpage"];
-            return query
-            }
-        )
+            dbReq
+            )
 
         .then(data=> res.json(data))
-    console.log(query);
-})
+});
 
 app.listen(port, hostname, function () {
     console.log(`Server listens http://${hostname}:${port}`)
-})
+});
 
 
