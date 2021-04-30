@@ -21,38 +21,56 @@ const knex = require('knex')({
 });
 
 app.get('/api', (req, res) => {
-    res.set({
-        'Content-Type': 'application/json',
-        'Content-Range': '10000',
-        // Access-Control-Allow-Credentials: true
-        // Access-Control-Allow-Headers: Accept, Content-Type, Cache-Control, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization
-        // Access-Control-Allow-Methods: OPTIONS,POST,GET
-        'Access-Control-Allow-Origin': 'http://localhost:3001'
-        // Access-Control-Expose-Headers: X-Total-Count
-        // Content-Type: application/json; charset=UTF-8
-        // X-Total-Count: 2
-        // Date: Fri, 16 Apr 2021 16:28:12 GMT
-        // Content-Length: 1050
-    });
     var dbReq = {};
     var reqLimit = req.query.perpage;
-    var sort = req.query.sort;
+    var start = req.query.start;
+    var end = req.query.end;
+    var sort = req.query.sort
     console.log(sort);
     console.log(sort[0]);
     (function (){
         dbReq = (req.query);
         delete dbReq.perpage;
+        delete dbReq.start;
+        delete dbReq.end;
         delete dbReq.sort;
+        delete dbReq.order;
         return dbReq
     }());
+    async function total (){
+        var totalrows = 1;
+        totalrows = await knex
+            .select()
+            .from('line')
+            .where(
+                dbReq
+            )
+            .then(data=> {
+                console.log(data.length);
+                data.length})
+    }
+    total();
     // var column = sort[0];
     // var order = sort['order'];
     console.log(dbReq);
+    console.log(totalrows);
     // console.log(order);
+    res.set({
+        'Content-Type': 'application/json',
+        'Content-Range': `posts ${start}-${end}/${totalrows}`,
+        // Access-Control-Allow-Credentials: true
+        // Access-Control-Allow-Headers: Accept, Content-Type, Cache-Control, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization
+        // Access-Control-Allow-Methods: OPTIONS,POST,GET
+        'Access-Control-Allow-Origin': 'http://localhost:3004',
+        'Access-Control-Expose-Headers': 'Content-Range'
+        // Content-Type: application/json; charset=UTF-8
+        // X-Total-Count: 2
+    });
+
     knex
         .select()
         .from('line')
-        .offset(0)
+        .offset(start)
         // .orderByRaw('gameid DESC')
         .orderBy([{column: "gameid", order: "asc"}])
         // .orderBy(sort)
@@ -60,7 +78,8 @@ app.get('/api', (req, res) => {
         .where(
             dbReq
             )
-        .then(data=> res.json(data))
+        .then(data=> {
+            res.json(data)})
 });
 app.disable('etag');
 app.listen(port, hostname, function () {
