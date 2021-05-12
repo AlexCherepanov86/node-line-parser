@@ -1,12 +1,13 @@
 import * as React from "react";
 import { List, Datagrid, DateField, TextField,  } from 'react-admin';
-
+import {ListFilters} from "./Filters";
 
 
 export const LineDataTable = (props) => (
     <List {...props}
           perPage={25}
           sort={{field: 'gameid', order: 'desc' }}
+          filters={<ListFilters />}
     >
         <Datagrid>
             <TextField source="gameid" />

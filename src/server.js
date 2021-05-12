@@ -27,6 +27,7 @@ server.get('/api', (req, res) => {
     var end = req.query.end;
     var sort = req.query.sort;
     var order = req.query.order;
+    // var dbFilter = req.query.filter;
 
     (function (){
         dbReq = (req.query);
@@ -37,27 +38,25 @@ server.get('/api', (req, res) => {
         delete dbReq.order;
         return dbReq
     }());
-    var totalrows = 1;
 
-    async function total (){
-        return totalrows = await knex
+    var totalrows = 0;
+
+    console.log(dbReq);
+    // console.log(dbFilter);
+    console.log(totalrows);
+    const getData = async() => {
+
+        await knex
             .select()
             .from('line')
             .where(
                 dbReq
             )
             .then(data=> {
-                // console.log(data.length);
-                data.length})
-    }
-    // var column = sort[0];
-    // var order = sort['order'];
-    console.log(dbReq);
-    console.log(totalrows);
-    // console.log(order);
-    const getData = async() => {
+                console.log(data.length);
+                totalrows = data.length}
+            );
 
-        await total();
         await res.set({
             'Content-Type': 'application/json',
             'Content-Range': `posts ${start}-${end}/${totalrows}`,
@@ -66,16 +65,13 @@ server.get('/api', (req, res) => {
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
             'Access-Control-Allow-Origin': '*',
             'Access-Control-Expose-Headers': 'Content-Range',
-            // Content-Type: application/json; charset=UTF-8
             // X-Total-Count: 2
         });
         await  knex
             .select()
             .from('line')
             .offset(start)
-            // .orderByRaw('gameid DESC')
             .orderBy([{column: `${sort}`, order: `${order}`}])
-            // .orderBy(sort)
             .limit(reqLimit)
             .where(
                 dbReq
@@ -83,7 +79,8 @@ server.get('/api', (req, res) => {
             .then(data=> {
                 res.json(data)})
     }
-    getData();
+    getData().then(data => data);
+
 });
 server.disable('etag');
 server.listen(port, hostname, function () {
