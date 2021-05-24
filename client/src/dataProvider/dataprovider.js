@@ -1,9 +1,7 @@
-// import {baseUrl} from '.baseUrl';
+import {baseUrl} from "./baseUrl";
 // import inMemoryJWT from 'ra-in-memory-jwt';
 import {fetchUtils} from 'ra-core';
 import {stringify} from 'query-string';
-
-const apiUrl = "http://127.0.0.1:3005/api";
 
 const httpClient = fetchUtils.fetchJson;
 
@@ -27,7 +25,7 @@ export default {
             end: page * perPage,
             perpage: perPage,
         };
-        const url = `${apiUrl}?${stringify(query)}`;
+        const url = `${baseUrl}/api?${stringify(query)}`;
 
         return httpClient(url).then(({ headers, json }) => ({
             data: json,

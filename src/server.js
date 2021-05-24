@@ -20,6 +20,24 @@ const knex = require('knex')({
     }
 });
 
+server.get('/filter', (req, res) => {
+    res.set({
+        'Content-Type': 'application/json',
+        // Access-Control-Allow-Credentials: true
+        // Access-Control-Allow-Headers: Accept, Content-Type, Cache-Control, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization
+        'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Expose-Headers': 'Content-Range',
+    });
+    knex
+        .select()
+        .distinct()
+        .column('league')
+        .from('line')
+        .then(data=> {
+            res.json(data)});
+})
+
 server.get('/api', (req, res) => {
     var dbReq = {};
     var reqLimit = req.query.perpage;
@@ -42,10 +60,9 @@ server.get('/api', (req, res) => {
     var totalrows = 0;
 
     console.log(dbReq);
-    // console.log(dbFilter);
     console.log(totalrows);
-    const getData = async() => {
 
+    const getData = async() => {
         await knex
             .select()
             .from('line')
@@ -53,10 +70,8 @@ server.get('/api', (req, res) => {
                 dbReq
             )
             .then(data=> {
-                console.log(data.length);
                 totalrows = data.length}
             );
-
         await res.set({
             'Content-Type': 'application/json',
             'Content-Range': `posts ${start}-${end}/${totalrows}`,
@@ -82,6 +97,7 @@ server.get('/api', (req, res) => {
     getData().then(data => data);
 
 });
+
 server.disable('etag');
 server.listen(port, hostname, function () {
     console.log(`Server listens http://${hostname}:${port}`)
