@@ -1,19 +1,32 @@
 import {AutocompleteArrayInput, Filter, SearchInput} from "react-admin";
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {baseUrl} from "../dataProvider/baseUrl";
 
 export const ListFilters = (props) => {
 
-    const FilterFetch = async () => {
-        return await fetch(baseUrl + '/filter').then(response => response.json())
-    }
-    const filterChoice = FilterFetch().then(filter=>filter)
-    console.log(filterChoice);
+    const [ filter, setFilters ] = useState([])
+
+    useEffect(()=> {
+        let newArr = []
+
+        fetch(baseUrl + '/filter')
+                .then(response => response.json())
+                .then(data => {
+                    data.map(item => {
+                        newArr.push(item.league)
+                        // console.log(newArr)
+                    })
+                    console.log(newArr)
+                    setFilters(newArr)
+                })
+
+    }, [])
+// console.log(filter)
 
     return(
         <Filter {...props}>
             <SearchInput source="gameid" helperText=" " placeholder="Номер" alwaysOn/>
-            <AutocompleteArrayInput label="Лига" allowEmpty={false} source="league" choices={filterChoice} />
+            <AutocompleteArrayInput label="Лига" allowEmpty={false} source="league" choices={filter} />
         </Filter>
     );
 };

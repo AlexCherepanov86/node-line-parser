@@ -23,8 +23,6 @@ const knex = require('knex')({
 server.get('/filter', (req, res) => {
     res.set({
         'Content-Type': 'application/json',
-        // Access-Control-Allow-Credentials: true
-        // Access-Control-Allow-Headers: Accept, Content-Type, Cache-Control, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization
         'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Expose-Headers': 'Content-Range',
