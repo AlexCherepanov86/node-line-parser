@@ -26,7 +26,7 @@ export const ListFilters = (props) => {
     return(
         <Filter {...props}>
             <SearchInput source="gameid" helperText=" " placeholder="Номер" alwaysOn/>
-            <AutocompleteArrayInput label="Лига" allowEmpty={false} source="league" choices={filter} />
+            <AutocompleteArrayInput label="Лига" source="league" choices={filter} allowEmpty={false}/>
         </Filter>
     );
 };

@@ -21,7 +21,7 @@ export const LineDataTable = (props) => (
             <TextField source="w1tie" />
             <TextField source="w12" />
             <TextField source="w2tie" />
-            <TextField source="lastchange" />
+            <DateField source="lastchange" />
         </Datagrid>
     </List>
 );

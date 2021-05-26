@@ -36,6 +36,24 @@ server.get('/filter', (req, res) => {
             res.json(data)});
 })
 
+server.get('/filters', (req, res) => {
+    knex
+        .column('league')
+        .select()
+        .from('line')
+        .limit(100)
+        .then(data=> {
+            // let data2 = new Map ([...data])
+            let result = [];
+            // Object.values = obj => Object.keys(obj).map(key => obj[key]);
+            // result = Object.values(data);
+            for (let value of Object.values(data)) {
+                result.push(value);
+            }
+            // result = Array.from(new Set(data));
+            return res.json(result)})
+})
+
 server.get('/api', (req, res) => {
     var dbReq = {};
     var reqLimit = req.query.perpage;
