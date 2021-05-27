@@ -27,31 +27,51 @@ server.get('/filter', (req, res) => {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Expose-Headers': 'Content-Range',
     });
-    knex
-        .select()
-        .distinct()
-        .column('league')
-        .from('line')
-        .then(data=> {
-            res.json(data)});
-})
 
-server.get('/filters', (req, res) => {
-    knex
-        .column('league')
-        .select()
-        .from('line')
-        .limit(100)
-        .then(data=> {
-            // let data2 = new Map ([...data])
-            let result = [];
-            // Object.values = obj => Object.keys(obj).map(key => obj[key]);
-            // result = Object.values(data);
-            for (let value of Object.values(data)) {
-                result.push(value);
-            }
-            // result = Array.from(new Set(data));
-            return res.json(result)})
+    let resultArr = {}
+    const getFilters = async () => {
+
+        let resultArrLeague = []
+        let resultArrTeam1 = []
+        let resultArrTeam2 = []
+
+        await  knex
+            .select()
+            .distinct()
+            .column('league')
+            .from('line')
+            .then(data => {
+                data.map(item => {
+                    item = {id: item.league, name: item.league}
+                    resultArrLeague.push(item)
+                })
+            });
+        await  knex
+            .select()
+            .distinct()
+            .column('t1')
+            .from('line')
+            .then(data => {
+                data.map(item => {
+                    item = {id: item.t1, name: item.t1}
+                    resultArrTeam1.push(item)
+                })
+            });
+        await  knex
+            .select()
+            .distinct()
+            .column('t2')
+            .from('line')
+            .then(data => {
+                data.map(item => {
+                    item = {id: item.t2, name: item.t2}
+                    resultArrTeam2.push(item)
+                })
+            });
+
+       return  resultArr = {league: resultArrLeague, team1: resultArrTeam1, team2:resultArrTeam2}
+    }
+    getFilters().then(resultArr => res.json(resultArr))
 })
 
 server.get('/api', (req, res) => {
