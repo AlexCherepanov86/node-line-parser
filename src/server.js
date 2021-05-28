@@ -81,7 +81,6 @@ server.get('/api', (req, res) => {
     var end = req.query.end;
     var sort = req.query.sort;
     var order = req.query.order;
-    // var dbFilter = req.query.filter;
 
     (function (){
         dbReq = (req.query);
@@ -96,7 +95,7 @@ server.get('/api', (req, res) => {
     var totalrows = 0;
 
     console.log(dbReq);
-    console.log(totalrows);
+    console.log(`'${Object.keys(dbReq)}',`, ...Object.values(dbReq));
 
     const getData = async() => {
         await knex
@@ -118,17 +117,25 @@ server.get('/api', (req, res) => {
             'Access-Control-Expose-Headers': 'Content-Range',
             // X-Total-Count: 2
         });
-        await  knex
+        await dbReq.length > 0 ? knex
             .select()
             .from('line')
             .offset(start)
             .orderBy([{column: `${sort}`, order: `${order}`}])
             .limit(reqLimit)
-            .where(
-                dbReq
-            )
+            .whereIn(`'${Object.keys(dbReq)}',`, [...Object.values(dbReq)])
             .then(data=> {
                 res.json(data)})
+    :
+            knex
+                .select()
+                .from('line')
+                .offset(start)
+                .orderBy([{column: `${sort}`, order: `${order}`}])
+                .limit(reqLimit)
+                .where(dbReq)
+                .then(data=> {
+                    res.json(data)})
     }
     getData().then(data => data);
 

@@ -9,7 +9,7 @@ export default {
     getList: (resource, params) => {
         const { page, perPage } = params.pagination;
         const { field, order } = params.sort;
-       console.log(params.sort)
+       console.log(params.filter)
 //         const query = {
 //             sort: JSON.stringify([field, order]),
 // //             sort: JSON.stringify([{'column: ${params.sort.field}', order}]),
