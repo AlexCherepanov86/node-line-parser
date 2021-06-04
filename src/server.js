@@ -95,17 +95,15 @@ server.get('/api', (req, res) => {
     var totalrows = 0;
 
     console.log(dbReq);
-    console.log(`'${Object.keys(dbReq)}',`, ...Object.values(dbReq));
 
     const getData = async() => {
         await knex
             .select()
             .from('line')
-            .where(
-                dbReq
-            )
-            .then(data=> {
-                totalrows = data.length}
+            .whereIn(`${Object.keys(dbReq)}`, ...Object.values(dbReq))
+            .then(data => {
+                    totalrows = data.length
+                }
             );
         await res.set({
             'Content-Type': 'application/json',
@@ -117,25 +115,41 @@ server.get('/api', (req, res) => {
             'Access-Control-Expose-Headers': 'Content-Range',
             // X-Total-Count: 2
         });
-        await dbReq.length > 0 ? knex
-            .select()
-            .from('line')
-            .offset(start)
-            .orderBy([{column: `${sort}`, order: `${order}`}])
-            .limit(reqLimit)
-            .whereIn(`'${Object.keys(dbReq)}',`, [...Object.values(dbReq)])
-            .then(data=> {
-                res.json(data)})
-    :
-            knex
-                .select()
-                .from('line')
-                .offset(start)
-                .orderBy([{column: `${sort}`, order: `${order}`}])
-                .limit(reqLimit)
-                .where(dbReq)
-                .then(data=> {
-                    res.json(data)})
+        await
+            // (Object.keys(dbReq).length > 1) ?
+            // knex
+            //     .select()
+            //     .from('line')
+            //     .offset(start)
+            //     .orderBy([{column: `${sort}`, order: `${order}`}])
+            //     .limit(reqLimit)
+            //     .whereIn([...Object.keys(dbReq)], ...Object.values(dbReq))
+            //     .then(data => {
+            //         res.json(data)
+            //     })
+            // :
+            // (Object.keys(dbReq).length === 1) ?
+            //     knex
+            //         .select()
+            //         .from('line')
+            //         .offset(start)
+            //         .orderBy([{column: `${sort}`, order: `${order}`}])
+            //         .limit(reqLimit)
+            //         .where(dbReq)
+            //         .then(data => {
+            //             res.json(data)
+            //         })
+                // :
+                knex
+                    .select()
+                    .from('line')
+                    .offset(start)
+                    .orderBy([{column: `${sort}`, order: `${order}`}])
+                    .limit(reqLimit)
+                    .whereIn(`${Object.keys(dbReq)}`, ...Object.values(dbReq))
+                    .then(data => {
+                        res.json(data)
+                    })
     }
     getData().then(data => data);
 
