@@ -92,22 +92,17 @@ server.get('/api', (req, res) => {
         return dbReq
     }());
 
-    var totalrows = 0;
 
     console.log(dbReq);
+    console.log(Object.keys(dbReq).length);
+    console.log(`${Object.keys(dbReq)}`, ...Object.values(dbReq));
+    console.log([...Object.keys(dbReq)], ...Object.values(dbReq));
 
     const getData = async() => {
-        await knex
-            .select()
-            .from('line')
-            .whereIn(`${Object.keys(dbReq)}`, ...Object.values(dbReq))
-            .then(data => {
-                    totalrows = data.length
-                }
-            );
+        var totalrows = 0;
+
         await res.set({
             'Content-Type': 'application/json',
-            'Content-Range': `posts ${start}-${end}/${totalrows}`,
             // Access-Control-Allow-Credentials: true
             // Access-Control-Allow-Headers: Accept, Content-Type, Cache-Control, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization
             'Access-Control-Allow-Methods': 'OPTIONS,POST,GET',
@@ -115,44 +110,65 @@ server.get('/api', (req, res) => {
             'Access-Control-Expose-Headers': 'Content-Range',
             // X-Total-Count: 2
         });
-        await
-            // (Object.keys(dbReq).length > 1) ?
-            // knex
-            //     .select()
-            //     .from('line')
-            //     .offset(start)
-            //     .orderBy([{column: `${sort}`, order: `${order}`}])
-            //     .limit(reqLimit)
-            //     .whereIn([...Object.keys(dbReq)], ...Object.values(dbReq))
-            //     .then(data => {
-            //         res.json(data)
-            //     })
-            // :
-            // (Object.keys(dbReq).length === 1) ?
-            //     knex
-            //         .select()
-            //         .from('line')
-            //         .offset(start)
-            //         .orderBy([{column: `${sort}`, order: `${order}`}])
-            //         .limit(reqLimit)
-            //         .where(dbReq)
-            //         .then(data => {
-            //             res.json(data)
-            //         })
-                // :
-                knex
+
+        (Object.keys(dbReq).length === 1 && Object.values(dbReq)[0].length === 1 || Object.keys(dbReq).length === 0) ?
+        (
+            await knex
+                    .select()
+                    .from('line')
+                    .offset(start)
+                    .orderBy([{column: `${sort}`, order: `${order}`}])
+                    .limit(reqLimit)
+                    .where(dbReq)
+                    .then(data=>{
+                        totalrows = data.length
+                        res.set({
+                            'Content-Range': `posts ${start}-${end}/${totalrows}`
+                        });
+                        res.json(data)
+                        console.log("вариант1");
+
+                     })
+        )
+                :
+                (Object.keys(dbReq).length === 1 && Object.values(dbReq)[0].length > 1 ) ?
+            (
+                await knex
                     .select()
                     .from('line')
                     .offset(start)
                     .orderBy([{column: `${sort}`, order: `${order}`}])
                     .limit(reqLimit)
                     .whereIn(`${Object.keys(dbReq)}`, ...Object.values(dbReq))
-                    .then(data => {
+                    .then(data=>{
+                        totalrows = data.length
+                        res.set({
+                            'Content-Range': `posts ${start}-${end}/${totalrows}`,
+                        });
                         res.json(data)
+                        console.log("вариант2");
                     })
+            )
+            :
+            (
+                await knex
+            .select()
+            .from('line')
+            .offset(start)
+            .orderBy([{column: `${sort}`, order: `${order}`}])
+            .limit(reqLimit)
+            .whereIn([...Object.keys(dbReq)], ...Object.values(dbReq))
+            .then(data => {
+                totalrows = data.length
+                res.set({
+                    'Content-Range': `posts ${start}-${end}/${totalrows}`,
+                });
+                res.json(data)
+                console.log("вариант3");
+            })
+            )
     }
     getData().then(data => data);
-
 });
 
 server.disable('etag');
